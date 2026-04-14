@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор лечебного меню на день</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #4f46e5;
+      --primary-2: #7c3aed;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --line: #e5e7eb;
+      --shadow: 0 10px 25px rgba(31, 41, 55, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, #f7f9fc 0%, #edf3ff 100%);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1280px, calc(100% - 32px));
+      margin: 24px auto 50px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #eef2ff 55%, #f3e8ff 100%);
+      border: 1px solid rgba(79, 70, 229, 0.08);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.08;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+
+    .hero-landing {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 14px;
+    }
+
+    .landing-block {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(3px);
+    }
+
+    .landing-block h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .landing-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .hero-chips {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      border: 1px solid rgba(17, 24, 39, 0.05);
+    }
+
+    .card h2, .card h3 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #eef2ff;
+      color: var(--primary);
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select,
+    input[type="file"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(79, 70, 229, 0.45);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.18);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: #eef2ff;
+    }
+
+    .btn-green {
+      color: white;
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.18);
+    }
+
+    .btn-ghost {
+      color: var(--muted);
+      background: #f9fafb;
+      border: 1px dashed var(--line);
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+      border: 1px solid var(--line);
+    }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .metric .v {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .day-plan {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .meal-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .meal-photo {
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #e0e7ff, #fce7f3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meal-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meal-photo .fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      opacity: 0.9;
+    }
+
+    .meal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .meal-top {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .meal-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .meal-time {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .meal-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mini-badge {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #374151;
+      font-weight: 700;
+    }
+
+    .meal-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .meal-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .meal-substitute {
+      background: #f8fafc;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .shopping-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .shop-group {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .shop-group h4 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .shop-group ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #475569;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .warnings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .warning-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #fed7aa;
+    }
+
+    .rules {
+      border-top: 1px solid var(--line);
+      margin-top: 16px;
+      padding-top: 14px;
+    }
+
+    .rules pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      max-height: 240px;
+      overflow: auto;
+    }
+
+    .phrase-toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 360px;
+      background: rgba(17, 24, 39, 0.94);
+      color: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: 0.3s ease;
+      z-index: 999;
+    }
+
+    .phrase-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px dashed var(--line);
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px 14px;
+    }
+
+    .faq-item summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .faq-item p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    body.theme-mint {
+      --bg: #f3fbf8;
+      --card: #ffffff;
+      --text: #16302b;
+      --muted: #52756c;
+      --primary: #0f766e;
+      --primary-2: #14b8a6;
+      --accent: #10b981;
+      --line: #d8efe7;
+      background: linear-gradient(180deg, #f3fffb 0%, #e6fff7 100%);
+    }
+
+    body.theme-sunset {
+      --bg: #fff8f3;
+      --card: #ffffff;
+      --text: #3b1f16;
+      --muted: #8a5a4b;
+      --primary: #ea580c;
+      --primary-2: #f97316;
+      --accent: #f59e0b;
+      --line: #ffe1d2;
+      background: linear-gradient(180deg, #fffaf6 0%, #ffefe5 100%);
+    }
+
+    body.theme-dark {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --text: #e5eefc;
+      --muted: #93a4bf;
+      --primary: #7c3aed;
+      --primary-2: #4f46e5;
+      --accent: #10b981;
+      --line: #243045;
+      background: linear-gradient(180deg, #0b1220 0%, #10192d 100%);
+    }
+
+    body.theme-dark .card,
+    body.theme-dark .hero,
+    body.theme-dark input,
+    body.theme-dark textarea,
+    body.theme-dark select,
+    body.theme-dark .metric,
+    body.theme-dark .meal-card,
+    body.theme-dark .shop-group,
+    body.theme-dark .meal-substitute,
+    body.theme-dark .footer-note,
+    body.theme-dark .empty-state {
+      background: #121a2b;
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    body.theme-dark .btn-secondary,
+    body.theme-dark .btn-ghost,
+    body.theme-dark .mini-badge,
+    body.theme-dark .badge {
+      background: #1a2640;
+      color: #dbe7ff;
+      border-color: var(--line);
+    }
+
+    body.theme-dark .warning-chip {
+      background: #2a1f14;
+      color: #ffd7b2;
+      border-color: #5a3a1e;
+    }
+
+    body.theme-dark .rules pre {
+      background: #08101d;
+      color: #d8e6ff;
+    }
+
+    .empty-state {
+      border: 2px dashed #c7d2fe;
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      color: var(--muted);
+      background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .day-plan { grid-template-columns: 1fr; }
+      .shopping-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .row-2, .row-3, .summary-grid, .shopping-grid { grid-template-columns: 1fr; }
+      .container { width: min(100% - 20px, 1280px); }
+      .hero, .card { padding: 16px; }
+      .hero-landing { grid-template-columns: 1fr; }
+      .meal-top { flex-direction: column; }
+      .phrase-toast { left: 12px; right: 12px; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Калькулятор лечебного меню на день</h1>
+      <p>
+        Загрузите рекомендации врача или вставьте текст вручную. Калькулятор попробует выделить ограничения,
+        режим питания, допустимые продукты и примерную калорийность, после чего соберёт меню на день,
+        подберёт варианты блюд, рассчитает список покупок на неделю и покажет красивые фото подачи блюд.
+      </p>
+      <div class="hero-chips">
+        <span class="hero-chip">Без сервера</span>
+        <span class="hero-chip">Работает в браузере</span>
+        <span class="hero-chip">Экспорт в JSON</span>
+      </div>
+      <!-- Приветственный лендинг внутри первой секции: краткий onboarding -->
+      <div class="hero-landing">
+        <div class="landing-block">
+          <h3>Быстрый старт за 3 шага</h3>
+          <ol class="landing-list">
+            <li>Вставьте текст рекомендаций врача или загрузите файл.</li>
+            <li>Уточните калорийность, тип диеты и ограничения.</li>
+            <li>Нажмите «Сформировать меню» и скачайте результат.</li>
+          </ol>
+          <div class="hero-actions">
+            <button type="button" class="btn-primary" id="heroStartBtn">Перейти к вводу данных</button>
+            <button type="button" class="btn-secondary" id="heroDemoBtn">Заполнить демо автоматически</button>
+            <button type="button" class="btn-ghost" id="heroFaqBtn">Посмотреть FAQ</button>
+          </div>
+        </div>
+        <div class="landing-block">
+          <h3>Что уже работает</h3>
+          <ul class="landing-list">
+            <li>Автоанализ текста рекомендаций по ключевым правилам.</li>
+            <li>Генерация меню на день с заменой отдельных блюд.</li>
+            <li>Список покупок на неделю и экспорт в JSON.</li>
+            <li>Выбор темы интерфейса с сохранением в браузере.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <aside class="card">
+        <div class="section-title">
+          <h2>Входные данные</h2>
+          <span class="badge">HTML + JS без сервера</span>
+        </div>
+
+        <div class="field">
+          <label for="doctorFile">Файл с рекомендациями врача (.txt, .md, .json)</label>
+          <input type="file" id="doctorFile" accept=".txt,.md,.json,.csv" />
+          <div class="note">
+            Для чистого HTML надёжнее всего использовать TXT/MD/JSON. PDF и DOCX без серверной обработки распознаются нестабильно,
+            поэтому здесь сделан безопасный текстовый сценарий.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="doctorText">Или вставьте рекомендации вручную</label>
+          <textarea id="doctorText" placeholder="Пример: дробное питание 5 раз в день, без жареного, без острого, щадящая диета, 1800 ккал/сутки, ограничить соль до 5 г, избегать грубой клетчатки, нежирная птица, рыба, каши, овощные супы..."></textarea>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="goalCalories">Цель по калориям, ккал/сутки</label>
+            <input type="number" id="goalCalories" value="1800" min="800" max="4000" step="50" />
+          </div>
+          <div class="field">
+            <label for="mealsCount">Приёмов пищи в день</label>
+            <select id="mealsCount">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="patientName">Имя пациента</label>
+            <input type="text" id="patientName" placeholder="Например, Анна" />
+          </div>
+          <div class="field">
+            <label for="dietType">Тип лечебного питания</label>
+            <select id="dietType">
+              <option value="auto" selected>Определить автоматически</option>
+              <option value="general_gentle">Щадящее питание</option>
+              <option value="gastro">Для ЖКТ</option>
+              <option value="liver">Для печени / желчного</option>
+              <option value="diabetes">Контроль сахара</option>
+              <option value="low_salt">С ограничением соли</option>
+              <option value="high_protein">Повышенный белок</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="manualExclude">Исключить продукты вручную</label>
+          <input type="text" id="manualExclude" placeholder="Например: молоко, грибы, перец чили, свинина" />
+        </div>
+
+        <div class="field">
+          <label for="manualInclude">Разрешённые продукты вручную</label>
+          <input type="text" id="manualInclude" placeholder="Например: индейка, кабачок, овсянка, треска, творог 5%" />
+        </div>
+
+        <div class="field">
+          <label>Тема интерфейса</label>
+          <div class="btn-row" id="themeButtons">
+            <button type="button" class="btn-secondary js-theme-btn" data-theme="default">Светлая</button>
+            <button type="button" class="btn-secondary js-theme-btn" data-theme="mint">Мятная</button>
+            <button type="button" class="btn-secondary js-theme-btn" data-theme="sunset">Теплая</button>
+            <button type="button" class="btn-secondary js-theme-btn" data-theme="dark">Тёмная</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="generateBtn">Сформировать меню</button>
+          <button class="btn-secondary" id="demoBtn">Загрузить демо</button>
+          <button class="btn-green" id="downloadBtn">Скачать меню .json</button>
+          <button class="btn-secondary" id="saveDraftBtn">Сохранить черновик</button>
+          <button class="btn-secondary" id="restoreDraftBtn">Восстановить черновик</button>
+          <button class="btn-ghost" id="resetBtn">Сбросить</button>
+        </div>
+
+        <div class="footer-note">
+          <strong>Важно:</strong> этот шаблон не заменяет врача. Он помогает красиво упаковать и визуализировать лечебное питание.
+          Логика основана на ключевых словах, встроенной базе продуктов и базовых правилах распределения калорий по приёмам пищи.
+          Для реального медицинского назначения проверяйте меню вручную.
+        </div>
+      </aside>
+
+      <main>
+        <section class="card" id="analysisCard">
+          <div class="section-title">
+            <h2>Разбор рекомендаций</h2>
+            <span class="badge">Автоанализ текста</span>
+          </div>
+          <div id="analysisContent" class="empty-state">
+            <strong>Пока ничего не рассчитано</strong>
+            Загрузите файл с рекомендациями врача или вставьте текст, затем нажмите «Сформировать меню».
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:20px;" id="menuCard">
+          <div class="section-title">
+            <h2>Меню на день</h2>
+            <span class="badge">Порции + блюда + фото</span>
+          </div>
+          <div id="menuContent" class="empty-state">
+            <strong>Меню ещё не создано</strong>
+            После расчёта здесь появится расписание питания на день с вариантами блюд и красивой подачей.
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:20px;" id="shoppingCard">
+          <div class="section-title">
+            <h2>Список покупок на неделю</h2>
+            <span class="badge">Автогенерация</span>
+          </div>
+          <div id="shoppingContent" class="empty-state">
+            <strong>Список покупок пуст</strong>
+            Он появится автоматически после генерации меню.
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:20px;" id="faqCard">
+          <div class="section-title">
+            <h2>FAQ по использованию</h2>
+            <span class="badge">Быстрые ответы</span>
+          </div>
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary>Можно ли использовать PDF или DOCX?</summary>
+              <p>В этой версии надёжно поддерживаются TXT, MD, CSV и JSON. Для PDF и DOCX нужен отдельный парсер или серверный модуль.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Как сохранить прогресс, чтобы продолжить позже?</summary>
+              <p>Нажмите «Сохранить черновик». Данные сохранятся в браузере и будут доступны по кнопке «Восстановить черновик».</p>
+            </details>
+            <details class="faq-item">
+              <summary>Подходит ли это для финального медицинского назначения?</summary>
+              <p>Нет, это вспомогательный инструмент для упаковки рекомендаций. Финальное меню нужно обязательно согласовывать с врачом.</p>
+            </details>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="phrase-toast" id="phraseToast"></div>
+
+  <script>
+    /*********************************************************************
+     * КАЛЬКУЛЯТОР ЛЕЧЕБНОГО МЕНЮ НА ДЕНЬ
+     * -------------------------------------------------------------------
+     * Что умеет этот файл:
+     * 1. Читать текст из файла .txt/.md/.json
+     * 2. Анализировать рекомендации врача по ключевым словам
+     * 3. Выделять разрешённые / запрещённые продукты
+     * 4. Составлять меню на день с учетом режима питания
+     * 5. Показывать фото блюд (через открытые запросы к Unsplash Source)
+     * 6. Собирать список покупок на 7 дней
+     * 7. Показывать милые мотивирующие фразы при выборе блюда
+     *
+     * Ограничения:
+     * - Без бэкенда и ИИ нельзя гарантировать медицинскую точность.
+     * - PDF/DOCX здесь не реализованы специально, чтобы не ломать переносимость.
+     * - Для реальных пациентов итог нужно проверять вручную.
+     *********************************************************************/
+
+    const state = {
+      recommendationsText: '',
+      rules: null,
+      menu: [],
+      shoppingList: null,
+      selectedDishes: {}
+    };
+
+    const elements = {
+      doctorFile: document.getElementById('doctorFile'),
+      doctorText: document.getElementById('doctorText'),
+      goalCalories: document.getElementById('goalCalories'),
+      mealsCount: document.getElementById('mealsCount'),
+      patientName: document.getElementById('patientName'),
+      dietType: document.getElementById('dietType'),
+      manualExclude: document.getElementById('manualExclude'),
+      manualInclude: document.getElementById('manualInclude'),
+      generateBtn: document.getElementById('generateBtn'),
+      demoBtn: document.getElementById('demoBtn'),
+      downloadBtn: document.getElementById('downloadBtn'),
+      saveDraftBtn: document.getElementById('saveDraftBtn'),
+      restoreDraftBtn: document.getElementById('restoreDraftBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      analysisContent: document.getElementById('analysisContent'),
+      menuContent: document.getElementById('menuContent'),
+      shoppingContent: document.getElementById('shoppingContent'),
+      phraseToast: document.getElementById('phraseToast')
+    };
+
+    const mealTimesMap = {
+      3: ['08:00', '13:30', '18:30'],
+      4: ['08:00', '11:30', '15:00', '19:00'],
+      5: ['08:00', '11:00', '14:00', '17:00', '19:30'],
+      6: ['07:30', '10:00', '12:30', '15:30', '18:00', '20:00']
+    };
+
+    const mealNamesMap = {
+      3: ['Завтрак', 'Обед', 'Ужин'],
+      4: ['Завтрак', 'Перекус', 'Обед', 'Ужин'],
+      5: ['Завтрак', 'Второй завтрак', 'Обед', 'Полдник', 'Ужин'],
+      6: ['Завтрак', 'Второй завтрак', 'Обед', 'Полдник', 'Ужин', 'Поздний перекус']
+    };
+
+    const calorieDistributions = {
+      3: [0.3, 0.4, 0.3],
+      4: [0.27, 0.13, 0.35, 0.25],
+      5: [0.25, 0.1, 0.35, 0.1, 0.2],
+      6: [0.22, 0.08, 0.3, 0.1, 0.2, 0.1]
+    };
+
+    const funPhrases = [
+      'Отличный выбор. Пусть тарелка сегодня работает на восстановление.',
+      'Красиво, мягко, полезно. Так лечебное питание соблюдать легче.',
+      'Эта тарелка выглядит так, будто о вас правда позаботились.',
+      'Нежно для организма и приятно для глаз. Идеальное сочетание.',
+      'Вы выбрали блюдо, которое хочется съесть без внутреннего торга.',
+      'Лечебное питание тоже может быть уютным и аппетитным.',
+      'Вот так и формируется привычка есть по режиму — без насилия над собой.',
+      'Маленький шаг для меню, большой шаг для самочувствия.',
+      'Очень удачный вариант. Организм сказал бы вам спасибо.',
+      'Сегодняшняя тарелка выглядит особенно дружелюбно.'
+    ];
+
+    const baseTags = {
+      forbidden: [
+        'жарен', 'остро', 'копчен', 'алкогол', 'фастфуд', 'майонез', 'газиров', 'маринад', 'консерв',
+        'перец чили', 'уксус', 'колбас', 'сосиск', 'жирн', 'сало'
+      ],
+      gentle: ['щадящ', 'протерт', 'теплое', 'не горячее', 'не холодное', 'дробное', 'варен', 'тушен', 'на пару'],
+      lowSalt: ['без соли', 'ограничить соль', 'мало соли', 'до 5 г соли', 'низкосолев'],
+      diabetes: ['сахар', 'глюкоз', 'диабет', 'низкий гликемический', 'исключить сладкое'],
+      liver: ['печен', 'желч', 'стол 5', 'холецист', 'гепат'],
+      gastro: ['гастрит', 'язв', 'жкт', 'желуд', 'кишеч', 'стол 1', 'стол 2'],
+      highProtein: ['белок', 'повышенный белок', 'восстановление', 'после операции', 'анем'],
+      frequency5: ['5 раз', '5-разовое', '5 приемов', 'пять раз'],
+      frequency6: ['6 раз', '6-разовое', '6 приемов', 'шесть раз'],
+      frequency4: ['4 раза', '4-разовое', '4 приема', 'четыре раза']
+    };
+
+    const productDB = {
+      proteins: [
+        { name: 'Куриная грудка', unit: 'г', weekly: 1200, allowed: ['general_gentle', 'gastro', 'liver', 'high_protein', 'low_salt'], banned: [] },
+        { name: 'Индейка', unit: 'г', weekly: 1200, allowed: ['general_gentle', 'gastro', 'liver', 'high_protein', 'low_salt'], banned: [] },
+        { name: 'Треска', unit: 'г', weekly: 1000, allowed: ['general_gentle', 'gastro', 'liver', 'high_protein', 'low_salt'], banned: [] },
+        { name: 'Хек', unit: 'г', weekly: 900, allowed: ['general_gentle', 'gastro', 'liver', 'low_salt'], banned: [] },
+        { name: 'Яйца', unit: 'шт', weekly: 10, allowed: ['general_gentle', 'diabetes', 'high_protein', 'low_salt'], banned: [] },
+        { name: 'Творог 5%', unit: 'г', weekly: 1200, allowed: ['general_gentle', 'gastro', 'diabetes', 'high_protein'], banned: [] },
+        { name: 'Йогурт натуральный без сахара', unit: 'г', weekly: 1400, allowed: ['general_gentle', 'diabetes', 'gastro'], banned: [] }
+      ],
+      carbs: [
+        { name: 'Овсянка', unit: 'г', weekly: 500, allowed: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Гречка', unit: 'г', weekly: 600, allowed: ['general_gentle', 'liver', 'diabetes', 'high_protein', 'low_salt'], banned: [] },
+        { name: 'Рис', unit: 'г', weekly: 600, allowed: ['general_gentle', 'gastro', 'liver', 'low_salt'], banned: [] },
+        { name: 'Булгур', unit: 'г', weekly: 500, allowed: ['liver', 'diabetes', 'low_salt'], banned: ['gastro'] },
+        { name: 'Картофель', unit: 'г', weekly: 1500, allowed: ['general_gentle', 'gastro', 'liver', 'low_salt'], banned: [] },
+        { name: 'Цельнозерновой хлеб', unit: 'г', weekly: 400, allowed: ['diabetes', 'high_protein'], banned: ['gastro'] }
+      ],
+      vegetables: [
+        { name: 'Кабачок', unit: 'г', weekly: 1200, allowed: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Цветная капуста', unit: 'г', weekly: 900, allowed: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Морковь', unit: 'г', weekly: 1000, allowed: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Тыква', unit: 'г', weekly: 1200, allowed: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Свекла', unit: 'г', weekly: 800, allowed: ['liver', 'general_gentle', 'low_salt'], banned: [] },
+        { name: 'Огурец', unit: 'г', weekly: 800, allowed: ['diabetes', 'low_salt', 'high_protein'], banned: ['gastro'] }
+      ],
+      fruits: [
+        { name: 'Банан', unit: 'шт', weekly: 7, allowed: ['general_gentle', 'gastro', 'high_protein'], banned: ['diabetes'] },
+        { name: 'Яблоки запеченные', unit: 'шт', weekly: 7, allowed: ['general_gentle', 'gastro', 'liver', 'low_salt'], banned: [] },
+        { name: 'Груша', unit: 'шт', weekly: 6, allowed: ['general_gentle', 'liver', 'low_salt'], banned: ['gastro'] },
+        { name: 'Ягоды', unit: 'г', weekly: 500, allowed: ['diabetes', 'high_protein', 'low_salt'], banned: ['gastro'] }
+      ],
+      fats: [
+        { name: 'Оливковое масло', unit: 'мл', weekly: 250, allowed: ['general_gentle', 'liver', 'diabetes', 'low_salt'], banned: [] },
+        { name: 'Сливочное масло', unit: 'г', weekly: 120, allowed: ['general_gentle', 'gastro'], banned: ['liver'] }
+      ]
+    };
+
+    const dishesDB = [
+      {
+        id: 'oatmeal_banana',
+        name: 'Овсяная каша с бананом',
+        type: 'Завтрак',
+        calories: 320,
+        portion: '280 г',
+        diets: ['general_gentle', 'gastro', 'low_salt'],
+        avoid: ['diabetes'],
+        ingredients: ['Овсянка', 'Банан', 'Йогурт натуральный без сахара'],
+        description: 'Мягкая тёплая каша с деликатной подачей и натуральной сладостью.',
+        photoQuery: 'beautiful oatmeal banana bowl healthy plate',
+        alt: ['Рисовая каша на воде', 'Омлет на пару с кабачком']
+      },
+      {
+        id: 'steam_omelet',
+        name: 'Паровой омлет с кабачком',
+        type: 'Завтрак',
+        calories: 280,
+        portion: '250 г',
+        diets: ['general_gentle', 'gastro', 'diabetes', 'high_protein', 'low_salt'],
+        avoid: [],
+        ingredients: ['Яйца', 'Кабачок'],
+        description: 'Нежная белковая подача, лёгкая для пищеварения.',
+        photoQuery: 'beautiful steamed omelet zucchini healthy breakfast plate',
+        alt: ['Творожная запеканка без сахара', 'Овсяная каша с ягодами']
+      },
+      {
+        id: 'curd_bowl',
+        name: 'Творожная тарелка с ягодами',
+        type: 'Второй завтрак',
+        calories: 220,
+        portion: '200 г',
+        diets: ['general_gentle', 'diabetes', 'high_protein', 'low_salt'],
+        avoid: ['gastro'],
+        ingredients: ['Творог 5%', 'Ягоды'],
+        description: 'Аккуратная белковая тарелка, которая выглядит как десерт, а работает как поддержка режима.',
+        photoQuery: 'beautiful cottage cheese berries healthy bowl',
+        alt: ['Натуральный йогурт', 'Запечённое яблоко']
+      },
+      {
+        id: 'baked_apple',
+        name: 'Запечённое яблоко с творогом',
+        type: 'Второй завтрак',
+        calories: 190,
+        portion: '180 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'low_salt'],
+        avoid: ['diabetes'],
+        ingredients: ['Яблоки запеченные', 'Творог 5%'],
+        description: 'Тёплый и уютный перекус с мягкой текстурой и красивой подачей.',
+        photoQuery: 'baked apple cottage cheese elegant plate',
+        alt: ['Банан', 'Йогурт натуральный']
+      },
+      {
+        id: 'zucchini_soup',
+        name: 'Суп-пюре из кабачка и цветной капусты',
+        type: 'Обед',
+        calories: 260,
+        portion: '320 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'low_salt'],
+        avoid: [],
+        ingredients: ['Кабачок', 'Цветная капуста', 'Морковь'],
+        description: 'Щадящий обед с кремовой текстурой и спокойным вкусом.',
+        photoQuery: 'beautiful zucchini cauliflower soup gourmet healthy plate',
+        alt: ['Тыквенный суп-пюре', 'Овощной суп с индейкой']
+      },
+      {
+        id: 'turkey_buckwheat',
+        name: 'Индейка с гречкой и тушёными овощами',
+        type: 'Обед',
+        calories: 460,
+        portion: '360 г',
+        diets: ['general_gentle', 'liver', 'diabetes', 'high_protein', 'low_salt'],
+        avoid: ['gastro'],
+        ingredients: ['Индейка', 'Гречка', 'Морковь', 'Кабачок'],
+        description: 'Сытная, аккуратная тарелка с хорошим балансом белка и сложных углеводов.',
+        photoQuery: 'beautiful turkey buckwheat vegetables healthy lunch plate',
+        alt: ['Куриная грудка с рисом', 'Треска с картофельным пюре']
+      },
+      {
+        id: 'cod_puree',
+        name: 'Треска с картофельным пюре и морковью',
+        type: 'Обед',
+        calories: 430,
+        portion: '340 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'low_salt'],
+        avoid: [],
+        ingredients: ['Треска', 'Картофель', 'Морковь'],
+        description: 'Классическая щадящая тарелка с красивой сервировкой и мягкими текстурами.',
+        photoQuery: 'beautiful cod mashed potatoes carrot elegant healthy plate',
+        alt: ['Хек с рисом', 'Индейка с кабачком']
+      },
+      {
+        id: 'yogurt_snack',
+        name: 'Натуральный йогурт и мягкий фрукт',
+        type: 'Полдник',
+        calories: 180,
+        portion: '180 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'diabetes', 'low_salt'],
+        avoid: [],
+        ingredients: ['Йогурт натуральный без сахара', 'Банан'],
+        description: 'Лёгкий перекус, который не перегружает и помогает держать режим.',
+        photoQuery: 'beautiful yogurt fruit snack elegant healthy bowl',
+        alt: ['Творог 5%', 'Запечённое яблоко']
+      },
+      {
+        id: 'pumpkin_soup',
+        name: 'Тыквенный суп-пюре',
+        type: 'Ужин',
+        calories: 240,
+        portion: '300 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'low_salt'],
+        avoid: ['diabetes'],
+        ingredients: ['Тыква', 'Морковь'],
+        description: 'Тёплый вечерний вариант с нежной текстурой и комфортной подачей.',
+        photoQuery: 'beautiful pumpkin soup healthy dinner elegant bowl',
+        alt: ['Овощное рагу', 'Треска с кабачком']
+      },
+      {
+        id: 'chicken_rice',
+        name: 'Куриная грудка с рисом и кабачком',
+        type: 'Ужин',
+        calories: 390,
+        portion: '320 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'high_protein', 'low_salt'],
+        avoid: [],
+        ingredients: ['Куриная грудка', 'Рис', 'Кабачок'],
+        description: 'Спокойный по вкусу и визуально аккуратный ужин без лишней тяжести.',
+        photoQuery: 'beautiful chicken rice zucchini healthy dinner plate',
+        alt: ['Треска с пюре', 'Омлет на пару']
+      },
+      {
+        id: 'protein_plate',
+        name: 'Белковая тарелка: индейка, овощи, йогуртовый соус',
+        type: 'Ужин',
+        calories: 350,
+        portion: '300 г',
+        diets: ['high_protein', 'diabetes', 'low_salt'],
+        avoid: ['gastro'],
+        ingredients: ['Индейка', 'Огурец', 'Морковь', 'Йогурт натуральный без сахара'],
+        description: 'Собранная тарелка с акцентом на белок и визуальную свежесть.',
+        photoQuery: 'beautiful high protein turkey vegetable plate healthy dinner',
+        alt: ['Творожная тарелка', 'Курица с гречкой']
+      },
+      {
+        id: 'late_snack',
+        name: 'Тёплый йогурт или творожный крем',
+        type: 'Поздний перекус',
+        calories: 150,
+        portion: '150 г',
+        diets: ['general_gentle', 'gastro', 'liver', 'high_protein', 'low_salt'],
+        avoid: ['diabetes'],
+        ingredients: ['Йогурт натуральный без сахара', 'Творог 5%'],
+        description: 'Небольшой вечерний приём пищи, чтобы выдержать режим без перегрузки.',
+        photoQuery: 'beautiful yogurt dessert bowl healthy night snack',
+        alt: ['Половина банана', 'Запечённое яблоко']
+      }
+    ];
+
+    // ------------------------- УТИЛИТЫ -------------------------
+
+    function normalizeText(text) {
+      return (text || '')
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function unique(arr) {
+      return [...new Set(arr)];
+    }
+
+    function parseCSVList(value) {
+      return (value || '')
+        .split(',')
+        .map(v => v.trim())
+        .filter(Boolean);
+    }
+
+    function randomPhrase() {
+      return funPhrases[Math.floor(Math.random() * funPhrases.length)];
+    }
+
+    function showToast(message) {
+      elements.phraseToast.textContent = message;
+      elements.phraseToast.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        elements.phraseToast.classList.remove('show');
+      }, 2600);
+    }
+
+    function safeNumber(value, fallback = 0) {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : fallback;
+    }
+
+    function collectFormPayload() {
+      return {
+        doctorText: elements.doctorText.value,
+        goalCalories: elements.goalCalories.value,
+        mealsCount: elements.mealsCount.value,
+        patientName: elements.patientName.value,
+        dietType: elements.dietType.value,
+        manualExclude: elements.manualExclude.value,
+        manualInclude: elements.manualInclude.value
+      };
+    }
+
+    function getMealEmoji(type) {
+      const map = {
+        'Завтрак': '🍽️',
+        'Второй завтрак': '🍏',
+        'Перекус': '🥛',
+        'Обед': '🥣',
+        'Полдник': '🍎',
+        'Ужин': '🥗',
+        'Поздний перекус': '🌙'
+      };
+      return map[type] || '🍽️';
+    }
+
+    function buildUnsplashPhoto(query) {
+      const q = encodeURIComponent(query);
+      return `https://source.unsplash.com/900x600/?${q}`;
+    }
+
+    function extractCalories(text) {
+      const patterns = [
+        /(\d{3,4})\s*ккал/gi,
+        /(\d{3,4})\s*kcal/gi,
+        /калорийность[^\d]{0,20}(\d{3,4})/gi
+      ];
+      for (const p of patterns) {
+        const match = p.exec(text);
+        if (match && match[1]) return Number(match[1]);
+      }
+      return null;
+    }
+
+    function detectMealsCount(text, fallback) {
+      if (baseTags.frequency6.some(tag => text.includes(tag))) return 6;
+      if (baseTags.frequency5.some(tag => text.includes(tag))) return 5;
+      if (baseTags.frequency4.some(tag => text.includes(tag))) return 4;
+      return fallback;
+    }
+
+    function hasAny(text, list) {
+      return list.some(item => text.includes(item));
+    }
+
+    function collectProductMentions(text) {
+      const allProducts = Object.values(productDB).flat();
+      const found = [];
+      allProducts.forEach(product => {
+        if (normalizeText(text).includes(normalizeText(product.name))) found.push(product.name);
+      });
+      return unique(found);
+    }
+
+    // ------------------------- АНАЛИЗ РЕКОМЕНДАЦИЙ -------------------------
+
+    function analyzeRecommendations(inputText, options) {
+      const text = normalizeText(inputText);
+      const detected = {
+        diet: 'general_gentle',
+        calories: safeNumber(options.goalCalories, 1800),
+        mealsCount: safeNumber(options.mealsCount, 5),
+        restrictions: [],
+        forbiddenFoods: [],
+        allowedFoods: [],
+        notes: [],
+        rawText: inputText
+      };
+
+      const extractedCalories = extractCalories(text);
+      if (extractedCalories) detected.calories = extractedCalories;
+      detected.mealsCount = detectMealsCount(text, detected.mealsCount);
+
+      const forcedDiet = options.dietType;
+      if (forcedDiet !== 'auto') {
+        detected.diet = forcedDiet;
+      } else {
+        if (hasAny(text, baseTags.diabetes)) detected.diet = 'diabetes';
+        else if (hasAny(text, baseTags.liver)) detected.diet = 'liver';
+        else if (hasAny(text, baseTags.gastro)) detected.diet = 'gastro';
+        else if (hasAny(text, baseTags.highProtein)) detected.diet = 'high_protein';
+        else if (hasAny(text, baseTags.lowSalt)) detected.diet = 'low_salt';
+        else if (hasAny(text, baseTags.gentle)) detected.diet = 'general_gentle';
+      }
+
+      if (hasAny(text, baseTags.gentle)) detected.restrictions.push('Щадящая термическая и текстурная обработка');
+      if (hasAny(text, baseTags.lowSalt)) detected.restrictions.push('Ограничение соли');
+      if (text.includes('без жарен')) detected.restrictions.push('Без жареного');
+      if (text.includes('без остр')) detected.restrictions.push('Без острого');
+      if (text.includes('дробн')) detected.restrictions.push('Дробное питание');
+      if (text.includes('на пару')) detected.restrictions.push('Приготовление на пару');
+      if (text.includes('варен')) detected.restrictions.push('Предпочтительно варёные блюда');
+      if (text.includes('тушен')) detected.restrictions.push('Предпочтительно тушёные блюда');
+      if (text.includes('без сахара') || text.includes('исключить сладкое')) detected.restrictions.push('Контроль быстрых углеводов');
+
+      // Явные запреты по словам
+      baseTags.forbidden.forEach(item => {
+        if (text.includes(item)) detected.forbiddenFoods.push(item);
+      });
+
+      // Поиск упомянутых разрешённых продуктов
+      detected.allowedFoods.push(...collectProductMentions(text));
+
+      // Ручные правки пользователя
+      detected.forbiddenFoods.push(...parseCSVList(options.manualExclude));
+      detected.allowedFoods.push(...parseCSVList(options.manualInclude));
+
+      // Расширяем запреты по типу диеты
+      if (detected.diet === 'gastro') {
+        detected.forbiddenFoods.push('грубая клетчатка', 'сырые грубые овощи', 'цельнозерновой хлеб', 'острые соусы');
+        detected.notes.push('Ставка на мягкие текстуры, тёплые блюда, супы-пюре и каши.');
+      }
+      if (detected.diet === 'liver') {
+        detected.forbiddenFoods.push('жирное мясо', 'жареные блюда', 'копчёности');
+        detected.notes.push('Лучше выбирать нежирную рыбу, птицу, овощные гарниры и щадящую обработку.');
+      }
+      if (detected.diet === 'diabetes') {
+        detected.forbiddenFoods.push('сахар', 'сладкие десерты', 'сладкие напитки');
+        detected.notes.push('Нужен контроль быстрых углеводов и ровное распределение калорий.');
+      }
+      if (detected.diet === 'low_salt') {
+        detected.forbiddenFoods.push('избыток соли', 'соленья');
+        detected.notes.push('Соль ограничивается, вкус лучше собирать на мягких травах и текстурах.');
+      }
+      if (detected.diet === 'high_protein') {
+        detected.notes.push('Усилен белковый блок: индейка, курица, рыба, творог, яйца.');
+      }
+
+      detected.forbiddenFoods = unique(detected.forbiddenFoods.map(x => x.toLowerCase()));
+      detected.allowedFoods = unique(detected.allowedFoods);
+      detected.restrictions = unique(detected.restrictions);
+
+      return detected;
+    }
+
+    // ------------------------- ПОДБОР БЛЮД -------------------------
+
+    function matchesDiet(dish, diet) {
+      return dish.diets.includes(diet) && !dish.avoid.includes(diet);
+    }
+
+    function isDishForbiddenByIngredients(dish, forbiddenFoods) {
+      const ingredients = dish.ingredients.map(i => normalizeText(i));
+      return forbiddenFoods.some(forbidden => {
+        const f = normalizeText(forbidden);
+        return ingredients.some(ing => ing.includes(f) || f.includes(ing));
+      });
+    }
+
+    function scoreDish(dish, targetCalories, rules) {
+      let score = 100;
+      score -= Math.abs(dish.calories - targetCalories) * 0.15;
+
+      // Бонус за явно разрешённые продукты
+      if (rules.allowedFoods.length) {
+        const allowedNorm = rules.allowedFoods.map(normalizeText);
+        const ingNorm = dish.ingredients.map(normalizeText);
+        const matched = ingNorm.filter(ing => allowedNorm.some(a => ing.includes(a) || a.includes(ing))).length;
+        score += matched * 8;
+      }
+
+      // Бонус за щадящие блюда для ЖКТ
+      if (rules.diet === 'gastro' || rules.diet === 'general_gentle') {
+        if (/суп|каша|пюре|паровой|запеч/.test(normalizeText(dish.name))) score += 10;
+      }
+
+      // Бонус за белковые блюда
+      if (rules.diet === 'high_protein') {
+        if (dish.ingredients.some(i => /индейка|куриная|треска|яйца|творог/.test(normalizeText(i)))) score += 12;
+      }
+
+      return score;
+    }
+
+    function selectBestDishForSlot(type, targetCalories, rules, alreadyUsedIds = []) {
+      const candidates = dishesDB
+        .filter(d => d.type === type)
+        .filter(d => matchesDiet(d, rules.diet))
+        .filter(d => !isDishForbiddenByIngredients(d, rules.forbiddenFoods))
+        .filter(d => !alreadyUsedIds.includes(d.id));
+
+      if (!candidates.length) {
+        // fallback: по типу и без явных запретов
+        const relaxed = dishesDB
+          .filter(d => d.type === type)
+          .filter(d => !isDishForbiddenByIngredients(d, rules.forbiddenFoods));
+        if (!relaxed.length) return null;
+        return relaxed.sort((a, b) => scoreDish(b, targetCalories, rules) - scoreDish(a, targetCalories, rules))[0];
+      }
+
+      return candidates.sort((a, b) => scoreDish(b, targetCalories, rules) - scoreDish(a, targetCalories, rules))[0];
+    }
+
+    function buildDayMenu(rules) {
+      const mealsCount = rules.mealsCount;
+      const names = mealNamesMap[mealsCount];
+      const times = mealTimesMap[mealsCount];
+      const dist = calorieDistributions[mealsCount];
+      const total = rules.calories;
+      const usedIds = [];
+
+      const menu = names.map((mealName, index) => {
+        const targetCalories = Math.round(total * dist[index]);
+        const dish = selectBestDishForSlot(mealName, targetCalories, rules, usedIds);
+
+        if (!dish) {
+          return {
+            id: `slot-${index}`,
+            mealName,
+            time: times[index],
+            calories: targetCalories,
+            portion: 'Уточнить вручную',
+            description: 'Не удалось автоматически подобрать блюдо по всем ограничениям. Проверьте правила или добавьте продукты вручную.',
+            ingredients: [],
+            alt: [],
+            photoQuery: 'healthy diet plate',
+            name: 'Подбор вручную',
+            emoji: getMealEmoji(mealName)
+          };
+        }
+
+        usedIds.push(dish.id);
+        return {
+          ...dish,
+          mealName,
+          time: times[index],
+          targetCalories,
+          emoji: getMealEmoji(mealName)
+        };
+      });
+
+      return menu;
+    }
+
+    // ------------------------- СПИСОК ПОКУПОК -------------------------
+
+    function buildShoppingList(menu, rules) {
+      const selectedIngredients = unique(menu.flatMap(item => item.ingredients || []));
+      const dbItems = Object.entries(productDB).flatMap(([group, items]) => items.map(item => ({ ...item, group })));
+
+      const result = {
+        proteins: [],
+        carbs: [],
+        vegetables: [],
+        fruits: [],
+        fats: []
+      };
+
+      dbItems.forEach(item => {
+        const fitsDiet = item.allowed.includes(rules.diet) || rules.diet === 'general_gentle';
+        const banned = (item.banned || []).includes(rules.diet);
+        const ingredientUsed = selectedIngredients.some(ing => normalizeText(ing) === normalizeText(item.name));
+        const manuallyAllowed = rules.allowedFoods.some(ing => normalizeText(ing) === normalizeText(item.name));
+
+        if ((fitsDiet || ingredientUsed || manuallyAllowed) && !banned) {
+          result[item.group].push(`${item.name} — ${item.weekly} ${item.unit}`);
+        }
+      });
+
+      // Добавим ручные разрешённые продукты, которых нет в базе
+      rules.allowedFoods.forEach(item => {
+        const exists = Object.values(result).flat().some(v => normalizeText(v).includes(normalizeText(item)));
+        if (!exists) result.vegetables.push(`${item} — количество уточнить вручную`);
+      });
+
+      return result;
+    }
+
+    // ------------------------- РЕНДЕР -------------------------
+
+    function renderAnalysis(rules) {
+      const dietLabels = {
+        general_gentle: 'Щадящее питание',
+        gastro: 'Для ЖКТ',
+        liver: 'Для печени / желчного',
+        diabetes: 'Контроль сахара',
+        low_salt: 'С ограничением соли',
+        high_protein: 'Повышенный белок'
+      };
+
+      const patient = elements.patientName.value.trim();
+      const patientLine = patient ? `<div class="badge">Пациент: ${escapeHTML(patient)}</div>` : '';
+
+      elements.analysisContent.innerHTML = `
+        <div class="summary-grid">
+          <div class="metric">
+            <div class="k">Тип питания</div>
+            <div class="v">${dietLabels[rules.diet] || 'Авто'}</div>
+          </div>
+          <div class="metric">
+            <div class="k">Калорийность</div>
+            <div class="v">${rules.calories} ккал</div>
+          </div>
+          <div class="metric">
+            <div class="k">Приёмов пищи</div>
+            <div class="v">${rules.mealsCount}</div>
+          </div>
+          <div class="metric">
+            <div class="k">Разрешённых продуктов</div>
+            <div class="v">${rules.allowedFoods.length}</div>
+          </div>
+        </div>
+
+        <div class="warnings">
+          ${patientLine}
+          ${(rules.restrictions || []).map(item => `<span class="warning-chip">${escapeHTML(item)}</span>`).join('') || '<span class="warning-chip">Ограничения не найдены автоматически</span>'}
+        </div>
+
+        <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <h3 style="margin-bottom:10px;">Что разрешено / отмечено</h3>
+            <div class="meal-substitute">${rules.allowedFoods.length ? escapeHTML(rules.allowedFoods.join(', ')) : 'Явные разрешённые продукты не выделены. Используется база по типу лечебного питания.'}</div>
+          </div>
+          <div>
+            <h3 style="margin-bottom:10px;">Что исключается / ограничивается</h3>
+            <div class="meal-substitute">${rules.forbiddenFoods.length ? escapeHTML(rules.forbiddenFoods.join(', ')) : 'Явные запрещённые продукты не выделены.'}</div>
+          </div>
+        </div>
+
+        ${rules.notes.length ? `
+          <div style="margin-top:16px;">
+            <h3 style="margin-bottom:10px;">Комментарии системы</h3>
+            <div class="meal-substitute">${escapeHTML(rules.notes.join(' '))}</div>
+          </div>` : ''}
+      `;
+    }
+
+    function renderMenu(menu, rules) {
+      const totalCalories = menu.reduce((sum, item) => sum + (item.calories || item.targetCalories || 0), 0);
+
+      elements.menuContent.innerHTML = `
+        <div class="summary-grid" style="margin-bottom:18px;">
+          <div class="metric">
+            <div class="k">План на день</div>
+            <div class="v">${menu.length} блюд</div>
+          </div>
+          <div class="metric">
+            <div class="k">Целевая калорийность</div>
+            <div class="v">${rules.calories}</div>
+          </div>
+          <div class="metric">
+            <div class="k">Калорийность меню</div>
+            <div class="v">${Math.round(totalCalories)}</div>
+          </div>
+          <div class="metric">
+            <div class="k">Режим</div>
+            <div class="v">${rules.mealsCount} приёмов</div>
+          </div>
+        </div>
+        <div class="day-plan">
+          ${menu.map((item, index) => renderMealCard(item, index)).join('')}
+        </div>
+      `;
+
+      bindMealActions();
+    }
+
+    function renderMealCard(item, index) {
+      const imgUrl = buildUnsplashPhoto(item.photoQuery || item.name);
+      return `
+        <article class="meal-card">
+          <div class="meal-photo">
+            <img src="${imgUrl}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="fallback" style="display:none;">${item.emoji || '🍽️'}</div>
+          </div>
+          <div class="meal-body">
+            <div class="meal-top">
+              <div>
+                <div class="meal-time">${escapeHTML(item.time)} • ${escapeHTML(item.mealName)}</div>
+                <h3 class="meal-title">${escapeHTML(item.name)}</h3>
+              </div>
+              <div class="meal-badges">
+                <span class="mini-badge">${item.calories || item.targetCalories} ккал</span>
+                <span class="mini-badge">${escapeHTML(item.portion || 'Уточнить')}</span>
+              </div>
+            </div>
+
+            <div class="meal-desc">${escapeHTML(item.description || '')}</div>
+
+            <div class="meal-substitute">
+              <strong>Состав:</strong> ${item.ingredients && item.ingredients.length ? escapeHTML(item.ingredients.join(', ')) : 'Уточнить вручную'}
+            </div>
+
+            ${item.alt && item.alt.length ? `
+              <div class="meal-substitute">
+                <strong>Варианты замены:</strong> ${escapeHTML(item.alt.join(', '))}
+              </div>` : ''}
+
+            <div class="meal-actions">
+              <button class="btn-primary js-select-meal" data-index="${index}">Выбрать блюдо</button>
+              <button class="btn-secondary js-change-meal" data-index="${index}">Заменить вариант</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderShoppingList(list) {
+      const groups = {
+        proteins: 'Белковые продукты',
+        carbs: 'Крупы и гарниры',
+        vegetables: 'Овощи и дополнительные продукты',
+        fruits: 'Фрукты и ягоды',
+        fats: 'Жиры и масла'
+      };
+
+      const filled = Object.entries(list).filter(([, items]) => items.length);
+      if (!filled.length) {
+        elements.shoppingContent.innerHTML = '<div class="empty-state"><strong>Список покупок пуст</strong>Подходящие позиции не найдены. Попробуйте разрешить больше продуктов вручную.</div>';
+        return;
+      }
+
+      elements.shoppingContent.innerHTML = `
+        <div class="shopping-grid">
+          ${filled.map(([key, items]) => `
+            <div class="shop-group">
+              <h4>${groups[key]}</h4>
+              <ul>${items.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul>
+            </div>
+          `).join('')}
+        </div>
+        <div class="footer-note">
+          Список покупок рассчитан на 7 дней на основе выбранного типа лечебного питания и блюд из дневного меню.
+          Количества ориентировочные и нужны для бытового планирования закупки.
+        </div>
+      `;
+    }
+
+    // ------------------------- ИНТЕРАКЦИЯ -------------------------
+
+    function bindMealActions() {
+      document.querySelectorAll('.js-select-meal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = Number(e.currentTarget.dataset.index);
+          state.selectedDishes[index] = true;
+          showToast(randomPhrase());
+        });
+      });
+
+      document.querySelectorAll('.js-change-meal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = Number(e.currentTarget.dataset.index);
+          replaceMeal(index);
+        });
+      });
+    }
+
+    function replaceMeal(index) {
+      const current = state.menu[index];
+      if (!current) return;
+
+      const rules = state.rules;
+      const sameTypeCandidates = dishesDB
+        .filter(d => d.type === current.mealName)
+        .filter(d => d.id !== current.id)
+        .filter(d => matchesDiet(d, rules.diet))
+        .filter(d => !isDishForbiddenByIngredients(d, rules.forbiddenFoods));
+
+      if (!sameTypeCandidates.length) {
+        showToast('Подходящая замена не найдена. Оставила текущий вариант.');
+        return;
+      }
+
+      const targetCalories = current.targetCalories || current.calories || 250;
+      const next = sameTypeCandidates.sort((a, b) => scoreDish(b, targetCalories, rules) - scoreDish(a, targetCalories, rules))[0];
+
+      state.menu[index] = {
+        ...next,
+        mealName: current.mealName,
+        time: current.time,
+        targetCalories,
+        emoji: getMealEmoji(current.mealName)
+      };
+
+      state.shoppingList = buildShoppingList(state.menu, state.rules);
+      renderMenu(state.menu, state.rules);
+      renderShoppingList(state.shoppingList);
+      showToast('Замена готова. Иногда новый вариант попадает в настроение точнее.');
+    }
+
+    // ------------------------- БЕЗОПАСНОСТЬ ВЫВОДА -------------------------
+
+    function escapeHTML(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ------------------------- ОСНОВНАЯ ЛОГИКА -------------------------
+
+    async function readUploadedFile(file) {
+      if (!file) return '';
+      const ext = file.name.split('.').pop()?.toLowerCase();
+
+      if (['txt', 'md', 'csv'].includes(ext)) {
+        return await file.text();
+      }
+
+      if (ext === 'json') {
+        const raw = await file.text();
+        try {
+          const parsed = JSON.parse(raw);
+          return typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2);
+        } catch {
+          return raw;
+        }
+      }
+
+      alert('Этот шаблон надёжно поддерживает TXT, MD, CSV и JSON. Для PDF/DOCX нужен отдельный парсер или серверная обработка.');
+      return '';
+    }
+
+    async function generatePlan() {
+      const manualText = elements.doctorText.value.trim();
+
+      if (!manualText) {
+        alert('Добавьте текст рекомендаций врача: загрузите файл или вставьте текст вручную.');
+        return;
+      }
+
+      state.recommendationsText = manualText;
+
+      const options = {
+        goalCalories: elements.goalCalories.value,
+        mealsCount: elements.mealsCount.value,
+        dietType: elements.dietType.value,
+        manualExclude: elements.manualExclude.value,
+        manualInclude: elements.manualInclude.value
+      };
+
+      const rules = analyzeRecommendations(manualText, options);
+      const menu = buildDayMenu(rules);
+      const shoppingList = buildShoppingList(menu, rules);
+
+      state.rules = rules;
+      state.menu = menu;
+      state.shoppingList = shoppingList;
+
+      renderAnalysis(rules);
+      renderMenu(menu, rules);
+      renderShoppingList(shoppingList);
+    }
+
+    function loadDemo() {
+      elements.doctorText.value = `
+Пациенту рекомендовано щадящее дробное питание 5 раз в день.
+Калорийность 1800 ккал/сутки.
+Исключить жареное, острое, копчёности, избыток соли, газированные напитки.
+Предпочтительно: блюда на пару, варёные и тушёные, тёплые по температуре.
+Разрешены: индейка, куриная грудка, нежирная рыба, творог 5%, овсянка, гречка, рис, кабачок, цветная капуста, морковь, тыква, запечённые яблоки.
+      `.trim();
+      elements.goalCalories.value = 1800;
+      elements.mealsCount.value = 5;
+      elements.dietType.value = 'general_gentle';
+      elements.manualExclude.value = 'майонез, колбаса';
+      elements.manualInclude.value = 'треска, йогурт натуральный без сахара';
+      showToast('Демо-данные загружены. Можно сразу формировать меню.');
+    }
+
+    function resetAll() {
+      elements.doctorFile.value = '';
+      elements.doctorText.value = '';
+      elements.goalCalories.value = 1800;
+      elements.mealsCount.value = 5;
+      elements.patientName.value = '';
+      elements.dietType.value = 'auto';
+      elements.manualExclude.value = '';
+      elements.manualInclude.value = '';
+
+      state.recommendationsText = '';
+      state.rules = null;
+      state.menu = [];
+      state.shoppingList = null;
+      state.selectedDishes = {};
+
+      elements.analysisContent.innerHTML = `
+        <div class="empty-state">
+          <strong>Пока ничего не рассчитано</strong>
+          Загрузите файл с рекомендациями врача или вставьте текст, затем нажмите «Сформировать меню».
+        </div>`;
+
+      elements.menuContent.innerHTML = `
+        <div class="empty-state">
+          <strong>Меню ещё не создано</strong>
+          После расчёта здесь появится расписание питания на день с вариантами блюд и красивой подачей.
+        </div>`;
+
+      elements.shoppingContent.innerHTML = `
+        <div class="empty-state">
+          <strong>Список покупок пуст</strong>
+          Он появится автоматически после генерации меню.
+        </div>`;
+    }
+
+    function downloadJSON() {
+      if (!state.rules || !state.menu.length) {
+        alert('Сначала сформируйте меню, потом можно скачать результат.');
+        return;
+      }
+
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        patientName: elements.patientName.value.trim(),
+        rules: state.rules,
+        menu: state.menu,
+        shoppingList: state.shoppingList
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'лечебное-меню-на-день.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function saveDraft() {
+      localStorage.setItem('dietMenuDraft', JSON.stringify(collectFormPayload()));
+      showToast('Черновик сохранён в браузере.');
+    }
+
+    function restoreDraft() {
+      const raw = localStorage.getItem('dietMenuDraft');
+      if (!raw) {
+        showToast('Черновик не найден. Сначала сохраните данные.');
+        return;
+      }
+      try {
+        const draft = JSON.parse(raw);
+        elements.doctorText.value = draft.doctorText || '';
+        elements.goalCalories.value = draft.goalCalories || 1800;
+        elements.mealsCount.value = draft.mealsCount || 5;
+        elements.patientName.value = draft.patientName || '';
+        elements.dietType.value = draft.dietType || 'auto';
+        elements.manualExclude.value = draft.manualExclude || '';
+        elements.manualInclude.value = draft.manualInclude || '';
+        showToast('Черновик восстановлен. Можно продолжать работу.');
+      } catch {
+        showToast('Не удалось прочитать черновик. Сохраните его заново.');
+      }
+    }
+
+    // ------------------------- СОБЫТИЯ -------------------------
+
+    elements.generateBtn.addEventListener('click', generatePlan);
+    elements.demoBtn.addEventListener('click', loadDemo);
+    elements.resetBtn.addEventListener('click', resetAll);
+    elements.downloadBtn.addEventListener('click', downloadJSON);
+    elements.saveDraftBtn.addEventListener('click', saveDraft);
+    elements.restoreDraftBtn.addEventListener('click', restoreDraft);
+    // Кнопки из приветственного лендинга дублируют ключевые действия
+    document.getElementById('heroDemoBtn')?.addEventListener('click', () => {
+      loadDemo();
+      elements.doctorText.focus();
+    });
+    document.getElementById('heroStartBtn')?.addEventListener('click', () => {
+      elements.doctorText.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      elements.doctorText.focus();
+      showToast('Начинаем с текста рекомендаций. После этого нажмите «Сформировать меню».');
+    });
+    document.getElementById('heroFaqBtn')?.addEventListener('click', () => {
+      document.getElementById('faqCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    elements.doctorFile.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await readUploadedFile(file);
+      if (text) {
+        elements.doctorText.value = text;
+        showToast('Файл загружен. Рекомендации добавлены в поле текста.');
+      }
+    });
+
+    function applyTheme(themeName) {
+      document.body.classList.remove('theme-mint', 'theme-sunset', 'theme-dark');
+      if (themeName !== 'default') {
+        document.body.classList.add(`theme-${themeName}`);
+      }
+      localStorage.setItem('dietMenuTheme', themeName);
+
+      document.querySelectorAll('.js-theme-btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+        if (btn.dataset.theme === themeName) {
+          btn.classList.remove('btn-secondary');
+          btn.classList.add('btn-primary');
+        }
+      });
+    }
+
+    document.querySelectorAll('.js-theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+
+    ['input', 'change'].forEach(eventName => {
+      [elements.doctorText, elements.goalCalories, elements.mealsCount, elements.patientName, elements.dietType, elements.manualExclude, elements.manualInclude]
+        .forEach(field => field?.addEventListener(eventName, () => {
+          localStorage.setItem('dietMenuDraftAutosave', JSON.stringify(collectFormPayload()));
+        }));
+    });
+
+    const autosave = localStorage.getItem('dietMenuDraftAutosave');
+    if (autosave && !elements.doctorText.value.trim()) {
+      try {
+        const draft = JSON.parse(autosave);
+        elements.doctorText.value = draft.doctorText || '';
+        elements.goalCalories.value = draft.goalCalories || 1800;
+        elements.mealsCount.value = draft.mealsCount || 5;
+        elements.patientName.value = draft.patientName || '';
+        elements.dietType.value = draft.dietType || 'auto';
+        elements.manualExclude.value = draft.manualExclude || '';
+        elements.manualInclude.value = draft.manualInclude || '';
+      } catch {}
+    }
+
+    applyTheme(localStorage.getItem('dietMenuTheme') || 'default');
+
+    // Первичная демо-инициализация для красивого первого экрана можно закомментировать
+    // loadDemo();
+  </script>
+</body>
+</html>
