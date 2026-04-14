@@ -4,9 +4,109 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Лечебное меню</title>
-  <meta http-equiv="refresh" content="0; url=%D0%9B%D0%B5%D1%87%D0%B5%D0%B1%D0%BD%D0%BE%D0%B5%20%D0%BC%D0%B5%D0%BD%D1%8E.html" />
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #4f46e5;
+    }
+
+    body.theme-dark {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --text: #e5eefc;
+      --muted: #93a4bf;
+      --line: #243045;
+      --primary: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: min(640px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 12px 24px rgba(31, 41, 55, 0.09);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+    }
+  </style>
 </head>
 <body>
-  <p>Если перенаправление не сработало, откройте <a href="./Лечебное меню.html">основную страницу</a>.</p>
+  <main class="card">
+    <h1>Лечебное меню</h1>
+    <p>Это стартовая страница проекта. Отсюда можно перейти к основному приложению и выбрать тему интерфейса.</p>
+    <p>Если нужно, откройте <a href="./Лечебное меню.html">основную страницу приложения</a>.</p>
+    <div class="actions">
+      <button type="button" id="themeToggleBtn">Переключить тему</button>
+    </div>
+  </main>
+
+  <script>
+    const themeKey = 'dietLandingTheme';
+    const toggleBtn = document.getElementById('themeToggleBtn');
+
+    function applyTheme(theme) {
+      document.body.classList.toggle('theme-dark', theme === 'dark');
+      localStorage.setItem(themeKey, theme);
+      toggleBtn.textContent = theme === 'dark' ? 'Включить светлую тему' : 'Включить темную тему';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const current = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+    applyTheme(localStorage.getItem(themeKey) || 'light');
+  </script>
 </body>
 </html>
